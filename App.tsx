@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsTab, setSettingsTab] = useState<'instructions' | 'logic'>('instructions');
+  const [isEmbedded, setIsEmbedded] = useState(false);
 
   const liveClientRef = useRef<LiveClient | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -63,6 +64,17 @@ const App: React.FC = () => {
     setErrorMsg(reason);
     setVolumes({ input: 0, output: 0 });
     initializeGemini();
+  }, []);
+
+  useEffect(() => {
+    // Detect if embedded in iframe or has ?embed=true
+    const isIframe = window.self !== window.top;
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasEmbedFlag = urlParams.get('embed') === 'true';
+    
+    if (isIframe || hasEmbedFlag) {
+      setIsEmbedded(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -222,7 +234,8 @@ const App: React.FC = () => {
       const response = await sendMessageToGemini(userText);
       setMessages(prev => [...prev, { id: Date.now().toString() + '-ai', role: 'model', text: response, timestamp: new Date(), language: selectedLanguage }]);
     } catch (error: any) {
-      setErrorMsg("Error communicating with advisor.");
+      console.error("Chat Error:", error);
+      setErrorMsg(error.message || "Error communicating with advisor.");
     } finally {
       setIsProcessingText(false);
     }
@@ -309,148 +322,166 @@ const App: React.FC = () => {
       )}
 
       {appMode === 'selection' && (
-        <div className="min-h-screen selection-gradient overflow-y-auto pb-20">
-          <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in">
-          <Logo />
-          <div className="flex items-center gap-4 md:gap-6">
-             <button 
-               onClick={() => setShowSettings(true)}
-               className="p-3 bg-white/60 hover:bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 hover:text-[#00AEEF] transition-all glass-card"
-               title="Advisor Settings"
-             >
-               <Settings size={20} />
-             </button>
-             <div className="hidden md:flex items-center gap-6">
-               <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white/60 px-4 py-2 rounded-full border border-slate-100 shadow-sm glass-card">
-                 <Globe size={14} className="text-[#00AEEF]"/> Global Advisory
-               </span>
-               <div className="w-10 h-10 bg-gradient-to-br from-[#00AEEF] to-[#10b981] text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 cursor-help animate-pulse" title="Active Sessions: Global">
-                  <Sparkles size={18} />
-               </div>
-             </div>
-          </div>
-        </header>
+        <div className={`min-h-screen selection-gradient overflow-y-auto ${isEmbedded ? 'pb-10' : 'pb-20'}`}>
+          {!isEmbedded ? (
+            <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in">
+              <Logo />
+              <div className="flex items-center gap-4 md:gap-6">
+                <button 
+                  onClick={() => setShowSettings(true)}
+                  className="p-3 bg-white/60 hover:bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 hover:text-[#00AEEF] transition-all glass-card"
+                  title="Advisor Settings"
+                >
+                  <Settings size={20} />
+                </button>
+                <div className="hidden md:flex items-center gap-6">
+                  <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white/60 px-4 py-2 rounded-full border border-slate-100 shadow-sm glass-card">
+                    <Globe size={14} className="text-[#00AEEF]"/> Global Advisory
+                  </span>
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#00AEEF] to-[#10b981] text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 cursor-help animate-pulse" title="Active Sessions: Global">
+                      <Sparkles size={18} />
+                  </div>
+                </div>
+              </div>
+            </header>
+          ) : (
+            <div className="flex justify-between items-center p-4 border-b border-white/40 bg-white/20 backdrop-blur-md sticky top-0 z-50">
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">NCPL Career AI</span>
+               <button 
+                  onClick={() => setShowSettings(true)}
+                  className="p-2 text-slate-500 hover:text-[#00AEEF]"
+                >
+                  <Settings size={18} />
+                </button>
+            </div>
+          )}
 
-        <section className="max-w-5xl mx-auto text-center px-6 mt-16 md:mt-24 animate-fade-in">
-          <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight mb-8">
-            <span className="brand-gradient-text">Career Guidance</span> <br className="hidden md:block"/> 
-            <span className="text-slate-900">for the IT World</span>
+        <section className={`max-w-5xl mx-auto text-center px-6 ${isEmbedded ? 'mt-8' : 'mt-16 md:mt-24'} animate-fade-in`}>
+          <h1 className={`${isEmbedded ? 'text-2xl' : 'text-4xl md:text-7xl'} font-extrabold tracking-tight mb-8`}>
+            {isEmbedded ? (
+              <span className="text-slate-900">Expert <span className="brand-gradient-text">IT Career Guidance</span></span>
+            ) : (
+              <>
+                <span className="brand-gradient-text">Career Guidance</span> <br className="hidden md:block"/> 
+                <span className="text-slate-900">for the IT World</span>
+              </>
+            )}
           </h1>
           
-          <div className="h-28 mb-10 flex flex-col items-center justify-center">
-            <div key={quoteIndex} className="animate-fade-in space-y-3">
-              <p className="text-slate-600 italic text-xl md:text-2xl font-semibold max-w-3xl px-4 mx-auto leading-snug">
-                "{DYNAMIC_QUOTES[quoteIndex].text}"
-              </p>
-              <div className="flex items-center justify-center gap-3">
-                <div className="h-px w-8 bg-[#00AEEF]/20"></div>
-                <p className="text-[#00AEEF] text-[11px] font-black uppercase tracking-[0.4em]">{DYNAMIC_QUOTES[quoteIndex].author}</p>
-                <div className="h-px w-8 bg-[#00AEEF]/20"></div>
+          {!isEmbedded && (
+            <div className="h-28 mb-10 flex flex-col items-center justify-center">
+              <div key={quoteIndex} className="animate-fade-in space-y-3">
+                <p className="text-slate-600 italic text-xl md:text-2xl font-semibold max-w-3xl px-4 mx-auto leading-snug">
+                  "{DYNAMIC_QUOTES[quoteIndex].text}"
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="h-px w-8 bg-[#00AEEF]/20"></div>
+                  <p className="text-[#00AEEF] text-[11px] font-black uppercase tracking-[0.4em]">{DYNAMIC_QUOTES[quoteIndex].author}</p>
+                  <div className="h-px w-8 bg-[#00AEEF]/20"></div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-16 leading-relaxed font-medium">
+          <p className={`${isEmbedded ? 'text-sm' : 'text-lg md:text-xl'} text-slate-500 max-w-2xl mx-auto mb-16 leading-relaxed font-medium`}>
             {labels.sub}
           </p>
         </section>
 
-        <section className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-6 animate-fade-in [animation-delay:0.2s]">
-          <button onClick={() => startInteraction('text')} className="group bg-white border border-slate-100 rounded-[3rem] text-left hover:border-emerald-500 hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.2)] transition-all duration-500 p-10 flex flex-col justify-between h-[400px] relative overflow-hidden glass-card hover-lift">
+        <section className={`max-w-5xl mx-auto grid grid-cols-1 ${isEmbedded ? 'gap-4' : 'md:grid-cols-2 gap-8'} px-6 animate-fade-in [animation-delay:0.2s]`}>
+          <button onClick={() => startInteraction('text')} className={`group bg-white border border-slate-100 rounded-[2.5rem] text-left hover:border-emerald-500 transition-all duration-500 ${isEmbedded ? 'p-6 h-[180px]' : 'p-10 h-[400px]'} relative overflow-hidden glass-card hover-lift`}>
             <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-125 duration-700"></div>
             <div>
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-8 group-hover:from-emerald-500 group-hover:to-teal-600 group-hover:text-white transition-all shadow-sm">
-                <MessageSquare size={32} />
+              <div className={`${isEmbedded ? 'w-10 h-10 mb-4' : 'w-16 h-16 mb-8'} bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:from-emerald-500 group-hover:to-teal-600 group-hover:text-white transition-all shadow-sm`}>
+                <MessageSquare size={isEmbedded ? 20 : 32} />
               </div>
-              <h3 className="text-3xl font-black text-slate-900 mb-4">{labels.textTitle}</h3>
-              <p className="text-slate-500 text-base leading-relaxed mb-6 font-medium">{labels.textDesc}</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 bg-emerald-100/50 rounded-xl text-[10px] font-black text-emerald-700 uppercase tracking-widest border border-emerald-200">Step-by-step</span>
-                <span className="px-3 py-1.5 bg-slate-100/50 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest border border-slate-200">Resume Tips</span>
-              </div>
+              <h3 className={`${isEmbedded ? 'text-xl' : 'text-3xl'} font-black text-slate-900 mb-2 truncate`}>{labels.textTitle}</h3>
+              <p className="text-slate-500 text-xs leading-relaxed mb-4 font-medium line-clamp-2">{labels.textDesc}</p>
             </div>
-            <div className="flex items-center gap-3 text-emerald-600 font-black text-xs uppercase tracking-[0.2em] group-hover:translate-x-2 transition-all">Start Chat <ArrowRight size={18} /></div>
+            <div className="flex items-center gap-3 text-emerald-600 font-black text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-all">Start Chat <ArrowRight size={14} /></div>
           </button>
 
-          <button onClick={() => startInteraction('voice')} className="group bg-white border border-slate-100 rounded-[3rem] text-left hover:border-blue-500 hover:shadow-[0_20px_60px_-15px_rgba(0,174,239,0.2)] transition-all duration-500 p-10 flex flex-col justify-between h-[400px] relative overflow-hidden glass-card hover-lift">
+          <button onClick={() => startInteraction('voice')} className={`group bg-white border border-slate-100 rounded-[2.5rem] text-left hover:border-blue-500 transition-all duration-500 ${isEmbedded ? 'p-6 h-[180px]' : 'p-10 h-[400px]'} relative overflow-hidden glass-card hover-lift`}>
             <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-125 duration-700"></div>
-            <div className="absolute top-8 right-10 flex flex-col items-end gap-2">
-              <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20">{labels.recommended}</span>
+            <div className={`absolute ${isEmbedded ? 'top-4 right-4' : 'top-8 right-10'} flex flex-col items-end gap-2`}>
+              <span className={`px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black rounded-full uppercase tracking-widest shadow-lg ${isEmbedded ? 'text-[8px]' : 'text-[10px]'}`}>{labels.recommended}</span>
             </div>
             <div>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl flex items-center justify-center text-[#00AEEF] mb-8 group-hover:from-[#00AEEF] group-hover:to-blue-600 group-hover:text-white transition-all shadow-sm">
-                <Mic size={32} />
+              <div className={`${isEmbedded ? 'w-10 h-10 mb-4' : 'w-16 h-16 mb-8'} bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl flex items-center justify-center text-[#00AEEF] group-hover:from-[#00AEEF] group-hover:to-blue-600 group-hover:text-white transition-all shadow-sm`}>
+                <Mic size={isEmbedded ? 20 : 32} />
               </div>
-              <h3 className="text-3xl font-black text-slate-900 mb-4">{labels.voiceTitle}</h3>
-              <p className="text-slate-500 text-base leading-relaxed mb-6 font-medium">{labels.voiceDesc}</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 bg-blue-100/50 rounded-xl text-[10px] font-black text-[#00AEEF] uppercase tracking-widest border border-blue-200">🎧 Live Audio</span>
-                <span className="px-3 py-1.5 bg-slate-100/50 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest border border-slate-200">Free Session</span>
-              </div>
+              <h3 className={`${isEmbedded ? 'text-xl' : 'text-3xl'} font-black text-slate-900 mb-2 truncate`}>{labels.voiceTitle}</h3>
+              <p className="text-slate-500 text-xs leading-relaxed mb-4 font-medium line-clamp-2">{labels.voiceDesc}</p>
             </div>
-            <div className="flex items-center gap-3 text-[#00AEEF] font-black text-xs uppercase tracking-[0.2em] group-hover:translate-x-2 transition-all">Start Voice <ArrowRight size={18} /></div>
+            <div className="flex items-center gap-3 text-[#00AEEF] font-black text-[10px] uppercase tracking-[0.2em] group-hover:translate-x-2 transition-all">Start Voice <ArrowRight size={14} /></div>
           </button>
         </section>
 
-        <section className="max-w-4xl mx-auto mt-32 px-6 text-center animate-fade-in [animation-delay:0.3s]">
-           <div className="flex flex-col items-center gap-6">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#00AEEF] to-[#10b981] rounded-full blur-2xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse"></div>
-                <div className="relative w-32 h-32 bg-slate-900 rounded-full flex items-center justify-center shadow-2xl ring-4 ring-white group-hover:scale-105 transition-transform duration-500">
-                   <Logo size="sm" theme="light" />
+        {!isEmbedded && (
+          <section className="max-w-4xl mx-auto mt-32 px-6 text-center animate-fade-in [animation-delay:0.3s]">
+             <div className="flex flex-col items-center gap-6">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[#00AEEF] to-[#10b981] rounded-full blur-2xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse"></div>
+                  <div className="relative w-32 h-32 bg-slate-900 rounded-full flex items-center justify-center shadow-2xl ring-4 ring-white group-hover:scale-105 transition-transform duration-500">
+                     <Logo size="sm" theme="light" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Your AI Career Advisor</h4>
-                <p className="text-[11px] text-[#00AEEF] font-black uppercase tracking-[0.4em]">Powered by NCPL Expertise</p>
-              </div>
-           </div>
-        </section>
-
-        <section className="max-w-6xl mx-auto mt-40 px-6 animate-fade-in [animation-delay:0.4s]">
-           <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-20 tracking-tight">Support for Every Step</h2>
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { icon: <GraduationCap/>, title: "Freshers", desc: "Foundational roadmaps for starting your journey.", color: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-100" },
-                { icon: <Users/>, title: "Experienced", desc: "Strategic transitions into advanced roles.", color: "bg-blue-50 text-blue-600 border-blue-100 shadow-blue-100" },
-                { icon: <RefreshCw/>, title: "Career Gaps", desc: "Confident plans for returning to the IT workforce.", color: "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-100" },
-                { icon: <Replace/>, title: "Switchers", desc: "Cross-skilling into tech from any background.", color: "bg-violet-50 text-violet-600 border-violet-100 shadow-violet-100" }
-              ].map((item, idx) => (
-                <div key={idx} className={`p-10 rounded-[2.5rem] border shadow-xl shadow-transparent transition-all hover:shadow-inherit duration-300 flex flex-col items-start gap-6 bg-white group hover-lift border-slate-100`}>
-                   <div className={`w-14 h-14 rounded-2xl shadow-sm flex items-center justify-center transition-all ${item.color} group-hover:scale-110`}>
-                     {React.cloneElement(item.icon as React.ReactElement<any>, { size: 28 })}
-                   </div>
-                   <div className="space-y-2 text-left">
-                     <h4 className="text-xl font-black text-slate-900 tracking-tight">{item.title}</h4>
-                     <p className="text-sm text-slate-500 leading-relaxed font-medium">{item.desc}</p>
-                   </div>
+                <div>
+                  <h4 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">Your AI Career Advisor</h4>
+                  <p className="text-[11px] text-[#00AEEF] font-black uppercase tracking-[0.4em]">Powered by NCPL Expertise</p>
                 </div>
-              ))}
-           </div>
-        </section>
+             </div>
+          </section>
+        )}
 
-        <footer className="max-w-4xl mx-auto mt-48 pt-20 border-t border-slate-100 px-6 pb-20 text-center animate-fade-in [animation-delay:0.6s]">
-           <Logo size="md" />
-           <p className="text-sm text-slate-500 mt-10 mb-4 font-semibold italic">"Empowering the next generation of IT leaders."</p>
-           <div className="flex justify-center gap-10 text-[11px] font-black uppercase tracking-widest text-[#00AEEF] mt-12">
-             <a href="https://ncplconsulting.net" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">About NCPL</a>
-             <a href="https://ncplconsulting.net/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Privacy Policy</a>
-             <a href="https://ncplconsulting.net/disclaimer" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Disclaimer</a>
-           </div>
-        </footer>
+        {!isEmbedded && (
+          <section className="max-w-6xl mx-auto mt-40 px-6 animate-fade-in [animation-delay:0.4s]">
+             <h2 className="text-center text-3xl md:text-4xl font-black text-slate-900 mb-20 tracking-tight">Support for Every Step</h2>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                  { icon: <GraduationCap/>, title: "Freshers", desc: "Foundational roadmaps for starting your journey.", color: "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-100" },
+                  { icon: <Users/>, title: "Experienced", desc: "Strategic transitions into advanced roles.", color: "bg-blue-50 text-blue-600 border-blue-100 shadow-blue-100" },
+                  { icon: <RefreshCw/>, title: "Career Gaps", desc: "Confident plans for returning to the IT workforce.", color: "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-100" },
+                  { icon: <Replace/>, title: "Switchers", desc: "Cross-skilling into tech from any background.", color: "bg-violet-50 text-violet-600 border-violet-100 shadow-violet-100" }
+                ].map((item, idx) => (
+                  <div key={idx} className={`p-10 rounded-[2.5rem] border shadow-xl shadow-transparent transition-all hover:shadow-inherit duration-300 flex flex-col items-start gap-6 bg-white group hover-lift border-slate-100`}>
+                     <div className={`w-14 h-14 rounded-2xl shadow-sm flex items-center justify-center transition-all ${item.color} group-hover:scale-110`}>
+                       {React.cloneElement(item.icon as React.ReactElement<any>, { size: 28 })}
+                     </div>
+                     <div className="space-y-2 text-left">
+                       <h4 className="text-xl font-black text-slate-900 tracking-tight">{item.title}</h4>
+                       <p className="text-sm text-slate-500 leading-relaxed font-medium">{item.desc}</p>
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </section>
+        )}
+
+        {!isEmbedded && (
+          <footer className="max-w-4xl mx-auto mt-48 pt-20 border-t border-slate-100 px-6 pb-20 text-center animate-fade-in [animation-delay:0.6s]">
+             <Logo size="md" />
+             <p className="text-sm text-slate-500 mt-10 mb-4 font-semibold italic">"Empowering the next generation of IT leaders."</p>
+             <div className="flex justify-center gap-10 text-[11px] font-black uppercase tracking-widest text-[#00AEEF] mt-12">
+               <a href="https://ncplconsulting.net" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">About NCPL</a>
+               <a href="https://ncplconsulting.net/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Privacy Policy</a>
+               <a href="https://ncplconsulting.net/disclaimer" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors">Disclaimer</a>
+             </div>
+          </footer>
+        )}
       </div>
       )}
 
       {appMode === 'segmentation' && (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 selection-gradient">
+        <div className={`min-h-screen flex flex-col items-center justify-center ${isEmbedded ? 'p-4' : 'p-6'} bg-slate-50 selection-gradient`}>
          <div className="max-w-2xl w-full animate-fade-in">
-           <button onClick={() => setAppMode('selection')} className="flex items-center gap-2 text-slate-400 hover:text-[#00AEEF] transition-all text-xs font-black uppercase tracking-[0.2em] mb-12">
-             <X size={18}/> Back to Home
+           <button onClick={() => setAppMode('selection')} className={`flex items-center gap-2 text-slate-400 hover:text-[#00AEEF] transition-all text-xs font-black uppercase tracking-[0.2em] ${isEmbedded ? 'mb-6' : 'mb-12'}`}>
+             <X size={18}/> Back
            </button>
-           <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">Your Career Stage</h2>
-           <p className="text-slate-500 text-lg mb-12 font-medium">Select the path that defines your current journey.</p>
+           <h2 className={`${isEmbedded ? 'text-2xl' : 'text-4xl md:text-5xl'} font-black text-slate-900 mb-4 tracking-tight`}>Your Career Stage</h2>
+           <p className="text-slate-500 text-sm mb-8 font-medium">Select your current journey.</p>
            
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+           <div className={`grid grid-cols-1 ${isEmbedded ? 'gap-3' : 'sm:grid-cols-2 gap-6'}`}>
               {[
                 { id: 'fresher', icon: <GraduationCap/>, label: "Fresher / Student", color: "text-emerald-500", bg: "hover:bg-emerald-50/80 hover:border-emerald-200 hover:shadow-emerald-200/20" },
                 { id: 'experienced', icon: <Users/>, label: "Experienced", color: "text-blue-500", bg: "hover:bg-blue-50/80 hover:border-blue-200 hover:shadow-blue-200/20" },
@@ -460,12 +491,12 @@ const App: React.FC = () => {
                 <button 
                   key={stage.id} 
                   onClick={() => selectStage(stage.id as UserStage)}
-                  className={`p-10 bg-white border border-slate-100 rounded-[2.5rem] text-left shadow-sm hover:shadow-2xl transition-all flex items-center gap-6 group glass-card ${stage.bg} hover-lift`}
+                  className={`${isEmbedded ? 'p-4 rounded-2xl' : 'p-10 rounded-[2.5rem]'} bg-white border border-slate-100 text-left shadow-sm hover:shadow-2xl transition-all flex items-center gap-4 group glass-card ${stage.bg} hover-lift`}
                 >
-                   <div className={`w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center ${stage.color} group-hover:scale-110 transition-transform ring-4 ring-transparent group-hover:ring-current/10`}>
-                     {React.cloneElement(stage.icon as React.ReactElement<any>, { size: 32 })}
+                   <div className={`${isEmbedded ? 'w-10 h-10 rounded-xl' : 'w-16 h-16 rounded-2xl'} bg-white shadow-sm flex items-center justify-center ${stage.color} group-hover:scale-110 transition-transform ring-4 ring-transparent group-hover:ring-current/10`}>
+                     {React.cloneElement(stage.icon as React.ReactElement<any>, { size: isEmbedded ? 20 : 32 })}
                    </div>
-                   <span className="font-black text-slate-800 text-xl tracking-tight">{stage.label}</span>
+                   <span className={`font-black text-slate-800 ${isEmbedded ? 'text-sm' : 'text-xl'} tracking-tight`}>{stage.label}</span>
                 </button>
               ))}
            </div>
@@ -475,10 +506,11 @@ const App: React.FC = () => {
 
       {(appMode === 'chat' || appMode === 'voice') && (
         <div className="flex flex-col h-screen bg-white text-slate-900 overflow-hidden">
-      <header className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-20 sticky top-0 shadow-sm glass-card">
+      <header className={`bg-white border-b border-slate-100 ${isEmbedded ? 'px-4 py-3' : 'px-6 py-4'} flex items-center justify-between z-20 sticky top-0 shadow-sm glass-card`}>
         <div className="flex items-center gap-4">
           <button onClick={disconnect} className="p-3 hover:bg-red-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-100"><X size={20} /></button>
-          <Logo size="sm" />
+          {!isEmbedded && <Logo size="sm" />}
+          {isEmbedded && <span className="text-[10px] font-black uppercase tracking-widest text-[#00AEEF]">Advisor</span>}
         </div>
         <div className="flex items-center gap-3">
           <button 
