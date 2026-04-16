@@ -1,0 +1,9 @@
+{
+  "name": "Copy of NCPL Career Advisor Bot",
+  "description": "Professional AI career consultant representing NCPL Consulting, specializing in IT career guidance and program placement.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "C7": [],
+  "aq": []
+}
