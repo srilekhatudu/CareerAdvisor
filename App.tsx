@@ -3,13 +3,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   PhoneOff, MessageSquare, ArrowRight, Mic, Send, X, ShieldCheck, 
   Target, Shield, ChevronRight, Briefcase, Globe, Volume2, Pause, Headphones, Loader2,
-  GraduationCap, Users, RefreshCw, Replace, CheckCircle2, Lock, Info, Sparkles
+  GraduationCap, Users, RefreshCw, Replace, CheckCircle2, Lock, Info, Sparkles, Settings
 } from 'lucide-react';
 import { LiveStatus, Message, AppMode, InteractionType, Language, UserStage } from './types';
 import { LiveClient } from './services/liveClient';
 import { sendMessageToGemini, initializeGemini } from './services/geminiService';
 import AudioVisualizer from './components/AudioVisualizer';
-import { DYNAMIC_QUOTES, LANGUAGE_LABELS, SYSTEM_INSTRUCTION } from './constants';
+import { DYNAMIC_QUOTES, LANGUAGE_LABELS, SYSTEM_INSTRUCTION, ROLE_SUGGESTION_LOGIC_DISPLAY } from './constants';
 
 const App: React.FC = () => {
   const [appMode, setAppMode] = useState<AppMode>('selection');
@@ -25,6 +25,8 @@ const App: React.FC = () => {
   const [isProcessingText, setIsProcessingText] = useState(false);
   const [currentTranscription, setCurrentTranscription] = useState<{user: string, model: string}>({user: '', model: ''});
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<'instructions' | 'logic'>('instructions');
 
   const liveClientRef = useRef<LiveClient | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -226,17 +228,105 @@ const App: React.FC = () => {
     }
   };
 
-  if (appMode === 'selection') {
-    return (
-      <div className="min-h-screen selection-gradient overflow-y-auto pb-20">
-        <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in">
+  return (
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-[#00AEEF]/10 selection:text-[#00AEEF]">
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">
+                  <Settings size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800">Advisor Configuration</h2>
+              </div>
+              <button 
+                onClick={() => setShowSettings(false)}
+                className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex border-b border-slate-100">
+              <button 
+                onClick={() => setSettingsTab('instructions')}
+                className={`flex-1 py-4 text-sm font-bold transition-all border-b-2 ${settingsTab === 'instructions' ? 'border-blue-500 text-blue-600 bg-blue-50/30' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+              >
+                System Instructions
+              </button>
+              <button 
+                onClick={() => setSettingsTab('logic')}
+                className={`flex-1 py-4 text-sm font-bold transition-all border-b-2 ${settingsTab === 'logic' ? 'border-blue-500 text-blue-600 bg-blue-50/30' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+              >
+                Role Suggestion Logic
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-8">
+              {settingsTab === 'instructions' ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-blue-600 mb-4">
+                    <Info size={16} />
+                    <span className="text-xs font-bold uppercase tracking-widest">Global Directives</span>
+                  </div>
+                  <pre className="text-sm text-slate-600 whitespace-pre-wrap font-mono bg-slate-50 p-6 rounded-2xl border border-slate-100 leading-relaxed">
+                    {SYSTEM_INSTRUCTION}
+                  </pre>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-600 mb-4">
+                    <Target size={16} />
+                    <span className="text-xs font-bold uppercase tracking-widest">Decision Framework</span>
+                  </div>
+                  <div className="prose prose-slate max-w-none">
+                    <div className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100">
+                      {ROLE_SUGGESTION_LOGIC_DISPLAY}
+                    </div>
+                  </div>
+                  <div className="mt-6 p-4 bg-amber-50 border border-amber-100 rounded-xl flex gap-3">
+                    <Sparkles className="text-amber-500 shrink-0" size={18} />
+                    <p className="text-xs text-amber-800 leading-normal">
+                      These rules are strictly enforced by the AI during both voice and text interactions to ensure accurate career mapping.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+              <button 
+                onClick={() => setShowSettings(false)}
+                className="px-6 py-2.5 bg-slate-800 text-white rounded-xl font-bold text-sm hover:bg-slate-700 transition-all shadow-lg shadow-slate-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {appMode === 'selection' && (
+        <div className="min-h-screen selection-gradient overflow-y-auto pb-20">
+          <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center animate-fade-in">
           <Logo />
-          <div className="hidden md:flex items-center gap-6">
-             <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white/60 px-4 py-2 rounded-full border border-slate-100 shadow-sm glass-card">
-               <Globe size={14} className="text-[#00AEEF]"/> Global Advisory
-             </span>
-             <div className="w-10 h-10 bg-gradient-to-br from-[#00AEEF] to-[#10b981] text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 cursor-help animate-pulse" title="Active Sessions: Global">
-                <Sparkles size={18} />
+          <div className="flex items-center gap-4 md:gap-6">
+             <button 
+               onClick={() => setShowSettings(true)}
+               className="p-3 bg-white/60 hover:bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 hover:text-[#00AEEF] transition-all glass-card"
+               title="Advisor Settings"
+             >
+               <Settings size={20} />
+             </button>
+             <div className="hidden md:flex items-center gap-6">
+               <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 bg-white/60 px-4 py-2 rounded-full border border-slate-100 shadow-sm glass-card">
+                 <Globe size={14} className="text-[#00AEEF]"/> Global Advisory
+               </span>
+               <div className="w-10 h-10 bg-gradient-to-br from-[#00AEEF] to-[#10b981] text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20 cursor-help animate-pulse" title="Active Sessions: Global">
+                  <Sparkles size={18} />
+               </div>
              </div>
           </div>
         </header>
@@ -349,12 +439,10 @@ const App: React.FC = () => {
            </div>
         </footer>
       </div>
-    );
-  }
+      )}
 
-  if (appMode === 'segmentation') {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 selection-gradient">
+      {appMode === 'segmentation' && (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 selection-gradient">
          <div className="max-w-2xl w-full animate-fade-in">
            <button onClick={() => setAppMode('selection')} className="flex items-center gap-2 text-slate-400 hover:text-[#00AEEF] transition-all text-xs font-black uppercase tracking-[0.2em] mb-12">
              <X size={18}/> Back to Home
@@ -383,17 +471,23 @@ const App: React.FC = () => {
            </div>
          </div>
       </div>
-    );
-  }
+      )}
 
-  return (
-    <div className="flex flex-col h-screen bg-white text-slate-900 overflow-hidden">
+      {(appMode === 'chat' || appMode === 'voice') && (
+        <div className="flex flex-col h-screen bg-white text-slate-900 overflow-hidden">
       <header className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between z-20 sticky top-0 shadow-sm glass-card">
         <div className="flex items-center gap-4">
           <button onClick={disconnect} className="p-3 hover:bg-red-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-100"><X size={20} /></button>
           <Logo size="sm" />
         </div>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="p-3 hover:bg-slate-50 rounded-2xl text-slate-400 hover:text-[#00AEEF] transition-all border border-transparent hover:border-slate-100"
+            title="Advisor Settings"
+          >
+            <Settings size={20} />
+          </button>
           <div className={`px-5 py-2.5 rounded-2xl flex items-center gap-3 transition-all shadow-sm border font-black text-[10px] uppercase tracking-[0.2em] ${
             interactionType === 'voice' 
               ? 'bg-blue-50 text-[#00AEEF] border-blue-100' 
@@ -550,6 +644,8 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+        </div>
+      )}
     </div>
   );
 };

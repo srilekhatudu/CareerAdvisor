@@ -110,3 +110,27 @@ export const DYNAMIC_QUOTES = [
   { text: "Your career is a journey, not a destination. Let's find the right path together.", author: "NCPL Mentors" },
   { text: "The best way to predict the future is to create it. Start your IT journey today.", author: "Peter Drucker" }
 ];
+
+export const ROLE_SUGGESTION_LOGIC_DISPLAY = `
+### 🎯 Information Requirements
+The system will collect the following before suggesting roles:
+- Name & Location
+- Education & Work Experience
+- IT vs Non-IT Background
+- Coding vs Non-Coding Preference
+- Target Roles & Interests
+
+### 🛠️ Role Assignment Logic
+- **Non-IT Engineering Degrees**: Primary suggestions are **Cloud Engineer** (low code) or **Data Engineer** (standard coding).
+- **Non-IT Education (BCom, MBA, etc.)**: Primary suggestions are **AI Data Analyst**, **AI Business Analyst**, or **IT Analyst**.
+- **Development Roles**: Require **5+ years** of specific development experience.
+- **Functional Roles**: Require prior experience in the **same professional domain**.
+- **Specialized AI Roles**: Require either **5+ years of IT experience** OR **10+ years of Non-IT experience**.
+
+### 🧩 Edge Case Handling
+- **No Formal Education**: Focuses on self-taught skills, certifications, and practical career strengths.
+- **Unrelated Background**: Identifies transferable skills (communication, analysis) and bridging pathways.
+- **Incomplete Education**: Provides options for portfolio building and online credentials.
+- **No Work Experience**: Prioritizes internships, freelancing, and volunteer tech projects.
+- **Career Switchers**: Maps existing strengths to realistic entry-level tech roles.
+`;
