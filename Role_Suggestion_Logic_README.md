@@ -133,13 +133,26 @@ If any of the required information is missing or unclear, the system should cont
 
 ---
 
+## 📝 Conversational Flow Logic Rules
+
+To ensure a polite, adaptive, and easy-to-follow conversation, the Voice Career Advisor and Professional Chat integrate the following logic rules with clear branching based on user responses:
+
+1. **Information Verification (Name)**: When a user provides only their name, do not ask for their country or location.
+2. **Non-IT Educational Background**: If the user has a non-IT educational background, the assistant should ask: *"Are you interested in IT jobs?"*
+3. **Coding Preferences**: If the user is interested in IT jobs, follow up with: *"Do you prefer coding or non-coding roles?"*
+4. **Beginners & Entry-Level**: For beginners entering the IT field, suggest suitable entry-level roles such as:
+   * AI Data Analyst
+   * AI Business Analyst
+   * IT Analyst
+5. **No Qualifications**: If the user has no formal education and no work experience, respond politely with: *"Sorry, we’re unable to assist without any educational background."*
+
+---
+
 ## 📌 Edge Cases & Constraints for Career Advisor System
 
 ### 🎓 Education-Related Edge Cases
-* **No Formal Education Provided**
-  * If the candidate reports no formal education, avoid assumptions.
-  * Focus on: Skills, Experience (informal or self-taught), Interests and strengths.
-  * Suggest practical career paths, certifications, or vocational training.
+* **No Formal Education Provided (and No Experience)**
+  * If the user has no formal education and no work experience, respond politely with: *"Sorry, we’re unable to assist without any educational background."*
 * **Unrelated or Irrelevant Education**
   * If education does not align with career goals: Do not dismiss it. Identify transferable skills (e.g., communication, analysis, discipline). Provide transition pathways (e.g., bridging courses, entry-level roles).
 * **Incomplete Education**

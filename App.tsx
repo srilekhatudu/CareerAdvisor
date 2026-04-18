@@ -506,27 +506,27 @@ const App: React.FC = () => {
 
       {(appMode === 'chat' || appMode === 'voice') && (
         <div className="flex flex-col h-screen bg-white text-slate-900 overflow-hidden">
-      <header className={`bg-white border-b border-slate-100 ${isEmbedded ? 'px-4 py-3' : 'px-6 py-4'} flex items-center justify-between z-20 sticky top-0 shadow-sm glass-card`}>
+      <header className={`bg-white border-b border-slate-100 ${isEmbedded ? 'px-4 py-3' : 'px-8 md:px-14 py-8'} flex items-center justify-between z-30 sticky top-0 shadow-sm`}>
         <div className="flex items-center gap-4">
-          <button onClick={disconnect} className="p-3 hover:bg-red-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-100"><X size={20} /></button>
+          <button onClick={disconnect} className={`${isEmbedded ? 'p-2' : 'p-3'} hover:bg-red-50 rounded-2xl text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-100`}><X size={isEmbedded ? 18 : 20} /></button>
           {!isEmbedded && <Logo size="sm" />}
           {isEmbedded && <span className="text-[10px] font-black uppercase tracking-widest text-[#00AEEF]">Advisor</span>}
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setShowSettings(true)}
-            className="p-3 hover:bg-slate-50 rounded-2xl text-slate-400 hover:text-[#00AEEF] transition-all border border-transparent hover:border-slate-100"
+            className={`${isEmbedded ? 'p-2' : 'p-3'} hover:bg-slate-50 rounded-2xl text-slate-400 hover:text-[#00AEEF] transition-all border border-transparent hover:border-slate-100`}
             title="Advisor Settings"
           >
-            <Settings size={20} />
+            <Settings size={isEmbedded ? 18 : 20} />
           </button>
-          <div className={`px-5 py-2.5 rounded-2xl flex items-center gap-3 transition-all shadow-sm border font-black text-[10px] uppercase tracking-[0.2em] ${
+          <div className={`${isEmbedded ? 'px-3 py-1.5' : 'px-5 py-2.5'} rounded-2xl flex items-center gap-2 transition-all shadow-sm border font-black text-[10px] uppercase tracking-[0.2em] ${
             interactionType === 'voice' 
               ? 'bg-blue-50 text-[#00AEEF] border-blue-100' 
               : 'bg-emerald-50 text-emerald-600 border-emerald-100'
           }`}>
-            <ShieldCheck size={18} />
-            <span className="hidden sm:inline">
+            <ShieldCheck size={isEmbedded ? 14 : 18} />
+            <span className={isEmbedded ? 'hidden' : 'hidden sm:inline'}>
               {interactionType === 'voice' ? 'Voice active' : 'Chat active'}
             </span>
           </div>
@@ -535,22 +535,22 @@ const App: React.FC = () => {
 
       <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         {interactionType === 'voice' && (
-          <div className={`flex flex-col items-center justify-center p-8 transition-all duration-700 ${isConnected ? 'w-full md:w-[45%] bg-slate-50 border-r border-slate-100' : 'w-full'}`}>
+          <div className={`flex flex-col items-center justify-center ${isEmbedded ? 'p-4' : 'p-8'} transition-all duration-700 ${isConnected ? 'w-full md:w-[45%] bg-slate-50 border-r border-slate-100' : 'w-full'}`}>
             {isConnected && (
-              <div className="mb-8 p-10 bg-white rounded-[4rem] shadow-2xl border border-slate-100 w-full max-w-sm animate-fade-in flex flex-col items-center glass-card relative overflow-hidden">
+              <div className={`${isEmbedded ? 'mb-4 p-6 rounded-[2rem]' : 'mb-8 p-10 rounded-[4rem]'} bg-white shadow-2xl border border-slate-100 w-full max-w-sm animate-fade-in flex flex-col items-center glass-card relative overflow-hidden`}>
                  <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#00AEEF] to-[#10b981]"></div>
-                 <div className="relative mb-8">
+                 <div className={`relative ${isEmbedded ? 'mb-4' : 'mb-8'}`}>
                     <div className="absolute inset-0 bg-current opacity-10 blur-xl rounded-full scale-150 animate-pulse" style={{ color: stageColors.primary }}></div>
-                    <div className="relative w-28 h-28 bg-slate-900 rounded-full flex items-center justify-center shadow-lg ring-4 ring-white">
+                    <div className={`relative ${isEmbedded ? 'w-20 h-20' : 'w-28 h-28'} bg-slate-900 rounded-full flex items-center justify-center shadow-lg ring-4 ring-white`}>
                         <Logo size="sm" theme="light" />
                     </div>
                  </div>
-                 <h3 className="font-black text-slate-900 text-2xl tracking-tight mb-2">Advisor Listening</h3>
-                 <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-8">Live Audio</p>
-                 <div className="flex items-center gap-4 px-6 py-3.5 bg-slate-50 rounded-[2rem] border border-slate-100 w-full justify-center shadow-inner">
+                 <h3 className={`font-black text-slate-900 ${isEmbedded ? 'text-lg' : 'text-2xl'} tracking-tight mb-2`}>Advisor Listening</h3>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6">Live Audio</p>
+                 <div className="flex items-center gap-4 px-4 py-2.5 bg-slate-50 rounded-[2rem] border border-slate-100 w-full justify-center shadow-inner">
                     <div className="relative flex items-center justify-center">
-                        <div className={`absolute w-4 h-4 rounded-full animate-ping opacity-20`} style={{ backgroundColor: stageColors.primary }}></div>
-                        <div className={`w-3 h-3 rounded-full ${
+                        <div className={`absolute w-3 h-3 rounded-full animate-ping opacity-20`} style={{ backgroundColor: stageColors.primary }}></div>
+                        <div className={`w-2 h-2 rounded-full ${
                           voiceState === 'speaking' ? 'bg-emerald-500' : 
                           voiceState === 'listening' ? 'bg-[#00AEEF]' : 
                           'bg-slate-300'
@@ -596,35 +596,32 @@ const App: React.FC = () => {
               <button onClick={() => setErrorMsg(null)} className="p-1 hover:bg-red-100 rounded-full transition-colors"><X size={16} /></button>
             </div>
           )}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-14 scrollbar-hide space-y-10 bg-slate-50/40">
+          <div ref={scrollRef} className={`flex-1 overflow-y-auto ${isEmbedded ? 'p-4 space-y-4' : 'p-6 md:p-14 space-y-10'} scrollbar-hide bg-slate-50/40`}>
             {messages.map((msg, i) => {
               const prevMsg = messages[i-1];
               const showTime = !prevMsg || (msg.timestamp.getTime() - prevMsg.timestamp.getTime() > 180000);
               return (
                 <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-fade-in`}>
                   {showTime && (
-                    <div className="w-full text-center my-10">
-                      <span className="px-6 py-2 bg-white shadow-sm border border-slate-100 text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] rounded-full">
+                    <div className={`w-full text-center ${isEmbedded ? 'my-4' : 'my-10'}`}>
+                      <span className={`px-4 py-1.5 bg-white shadow-sm border border-slate-100 text-[10px] text-slate-400 font-black uppercase tracking-[0.4em] rounded-full`}>
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   )}
-                  <div className={`max-w-[88%] md:max-w-[80%] p-8 rounded-[3rem] text-base leading-relaxed border transition-all shadow-md ${
+                  <div className={`max-w-[90%] ${isEmbedded ? 'p-4 rounded-2xl' : 'md:max-w-[80%] p-8 rounded-[3rem]'} text-sm leading-relaxed border transition-all shadow-md ${
                     msg.role === 'user' 
                       ? 'bg-slate-900 text-white rounded-tr-none border-slate-900 shadow-xl' 
                       : 'bg-white text-slate-800 rounded-tl-none border-slate-100'
                   }`}>
                     <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
-                    {(msg.text.includes('NCPL') || msg.text.includes('roadmap') || msg.text.includes('Consulting')) && msg.role === 'model' && (
-                      <div className="mt-8 p-5 bg-[#00AEEF]/5 rounded-[2rem] border border-[#00AEEF]/10 flex items-start gap-4 group">
-                        <div className="p-3 bg-white rounded-2xl shadow-sm group-hover:bg-[#00AEEF] group-hover:text-white transition-all">
-                          <Target size={22} className="text-[#00AEEF] group-hover:text-white" />
+                    {(msg.text.includes('Roadmap') || msg.text.includes('NCPL')) && msg.role === 'model' && (
+                      <div className={`mt-4 ${isEmbedded ? 'p-3' : 'p-5'} bg-[#00AEEF]/5 rounded-xl border border-[#00AEEF]/10 flex items-start gap-3 group`}>
+                        <div className="p-2 bg-white rounded-lg shadow-sm group-hover:bg-[#00AEEF] group-hover:text-white transition-all">
+                          <Target size={18} className="text-[#00AEEF] group-hover:text-white" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-[11px] font-black text-[#00AEEF] uppercase tracking-widest mb-1">NCPL Program</p>
-                          <a href="https://ncplconsulting.net" target="_blank" rel="noopener noreferrer" className="text-base font-bold text-slate-700 hover:text-[#00AEEF] hover:underline flex items-center gap-2 transition-all">
-                            Details <ArrowRight size={16} />
-                          </a>
+                          <p className="text-[10px] font-black text-[#00AEEF] uppercase tracking-widest">Explore Program</p>
                         </div>
                       </div>
                     )}
@@ -635,7 +632,7 @@ const App: React.FC = () => {
             
             {currentTranscription.user && (
               <div className="flex flex-col items-end opacity-70 animate-fade-in">
-                <div className="p-6 bg-white text-slate-500 rounded-[2rem] rounded-tr-none text-sm italic border border-slate-100 shadow-sm border-dashed">
+                <div className={`${isEmbedded ? 'p-3 rounded-xl' : 'p-6 rounded-[2rem]'} bg-white text-slate-500 rounded-tr-none text-xs italic border border-slate-100 shadow-sm border-dashed`}>
                   {currentTranscription.user}
                 </div>
               </div>
@@ -643,34 +640,34 @@ const App: React.FC = () => {
             
             {currentTranscription.model && (
               <div className="flex flex-col items-start opacity-70 animate-fade-in">
-                <div className="p-6 bg-emerald-50 text-emerald-800 rounded-[2rem] rounded-tl-none text-sm italic border border-emerald-100 shadow-sm border-dashed">
+                <div className={`${isEmbedded ? 'p-3 rounded-xl' : 'p-6 rounded-[2rem]'} bg-emerald-50 text-emerald-800 rounded-tl-none text-xs italic border border-emerald-100 shadow-sm border-dashed`}>
                   {currentTranscription.model}
                 </div>
               </div>
             )}
             
             {isProcessingText && (
-              <div className="flex gap-2.5 p-6 bg-white rounded-[2rem] w-fit ml-4 border border-slate-100 shadow-sm">
-                <div className="w-2.5 h-2.5 bg-[#00AEEF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                <div className="w-2.5 h-2.5 bg-[#10b981] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                <div className="w-2.5 h-2.5 bg-[#FBBF24] rounded-full animate-bounce"></div>
+              <div className={`flex gap-2 ${isEmbedded ? 'p-3' : 'p-6'} bg-white rounded-2xl w-fit ml-4 border border-slate-100 shadow-sm`}>
+                <div className="w-2 h-2 bg-[#00AEEF] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="w-2 h-2 bg-[#10b981] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="w-2 h-2 bg-[#FBBF24] rounded-full animate-bounce"></div>
               </div>
             )}
           </div>
 
-          <div className="p-10 md:p-14 border-t border-slate-100 bg-white sticky bottom-0 z-20 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.06)]">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-6 max-w-4xl mx-auto relative group">
+          <div className={`${isEmbedded ? 'p-4' : 'p-10 md:p-14'} border-t border-slate-100 bg-white sticky bottom-0 z-20 shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.06)]`}>
+            <form onSubmit={handleSendMessage} className={`flex items-center ${isEmbedded ? 'gap-2' : 'gap-6'} max-w-4xl mx-auto relative group`}>
               <div className="relative flex-1">
                 <input 
                   value={inputText} 
                   onChange={(e) => setInputText(e.target.value)} 
-                  placeholder="Type your message..."
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[2.5rem] px-12 py-7 pr-24 text-base font-bold text-slate-700 focus:outline-none focus:border-[#00AEEF] focus:bg-white transition-all h-[88px] shadow-inner placeholder:text-slate-300"
+                  placeholder="Type message..."
+                  className={`w-full bg-slate-50 border-2 border-slate-100 rounded-full ${isEmbedded ? 'px-4 py-3 pr-16 text-sm h-[54px]' : 'px-12 py-7 pr-24 text-base h-[88px]'} font-bold text-slate-700 focus:outline-none focus:border-[#00AEEF] focus:bg-white transition-all shadow-inner placeholder:text-slate-300`}
                 />
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-[#00AEEF] to-[#10b981] rounded-full opacity-40"></div>
+                {!isEmbedded && <div className="absolute left-5 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-[#00AEEF] to-[#10b981] rounded-full opacity-40"></div>}
               </div>
-              <button type="submit" disabled={isProcessingText || !inputText.trim()} className="p-7 bg-gradient-to-tr from-[#00AEEF] to-[#10b981] text-white rounded-[2rem] hover:scale-105 transition-all shadow-2xl shadow-blue-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center">
-                <Send size={28} />
+              <button type="submit" disabled={isProcessingText || !inputText.trim()} className={`${isEmbedded ? 'p-3 w-[54px] h-[54px]' : 'p-7 w-[88px] h-[88px]'} bg-gradient-to-tr from-[#00AEEF] to-[#10b981] text-white rounded-full hover:scale-105 transition-all shadow-xl shadow-blue-500/20 active:scale-95 disabled:opacity-30 flex items-center justify-center`}>
+                <Send size={isEmbedded ? 20 : 28} />
               </button>
             </form>
           </div>

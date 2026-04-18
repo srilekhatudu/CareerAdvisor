@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCPL Consulting - Sample Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+        }
+        header {
+            background: #fff;
+            padding: 20px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .logo {
+            font-weight: 900;
+            font-size: 24px;
+            color: #00AEEF;
+        }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+        }
+        .hero {
+            padding: 100px 10%;
+            text-align: center;
+            background: linear-gradient(135deg, #00AEEF 0%, #10b981 100%);
+            color: white;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 60px 10%;
+            background: white;
+            max-width: 800px;
+            margin: -50px auto 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">NCPL Consulting</div>
+        <nav>
+            <a href="#">Solutions</a>
+            <a href="#">Training</a>
+            <a href="#">Career</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Transforming IT Careers</h1>
+        <p>Expert training, placement, and strategic advisory for the digital era.</p>
+    </div>
+
+    <div class="content">
+        <h2>About Our Method</h2>
+        <p>This is a sample website to demonstrate how your AI Career Advisor widget will look and behave when integrated into your existing pages. Notice the blue bubble in the bottom right corner of your screen.</p>
+        <p>Feel free to click the bubble to start a conversation with the AI. It will open a compact, mobile-ready version of the chatbot without leaving this page.</p>
+        <p>The widget is designed to be non-intrusive while remaining easily accessible to your users at any point of their journey.</p>
+    </div>
+
+    <footer>
+        &copy; 2026 NCPL Consulting. All rights reserved.
+    </footer>
+
+    <!-- WIDGET CODE START -->
+    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 999999; display: flex; flex-direction: column; align-items: flex-end; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <iframe 
+            id="advisor-chat-iframe"
+            src="./?embed=true" 
+            style="width: 380px; height: 580px; border: none; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); display: none; margin-bottom: 12px; background: white; border: 1px solid rgba(0,0,0,0.05);"
+            allow="microphone"
+        ></iframe>
+        <button 
+            id="chat-toggle-btn"
+            style="width: 56px; height: 56px; border-radius: 28px; background: #00AEEF; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,174,239,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); outline: none;"
+        >
+            <svg id="chat-icon" viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <svg id="close-icon" style="display: none;" viewBox="0 0 24 24" width="24" height="24" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const btn = document.getElementById('chat-toggle-btn');
+        const frame = document.getElementById('advisor-chat-iframe');
+        const chatIcon = document.getElementById('chat-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        btn.onclick = () => {
+            const isHidden = frame.style.display === 'none';
+            frame.style.display = isHidden ? 'block' : 'none';
+            chatIcon.style.display = isHidden ? 'none' : 'block';
+            closeIcon.style.display = isHidden ? 'block' : 'none';
+            
+            if (isHidden) {
+                btn.style.transform = 'rotate(90deg) scale(0.9)';
+                setTimeout(() => { btn.style.transform = 'rotate(0deg) scale(1)'; }, 100);
+            }
+        };
+
+        btn.onmouseover = () => { btn.style.transform = 'scale(1.1) translateY(-5px)'; };
+        btn.onmouseout = () => { btn.style.transform = 'scale(1)'; };
+    </script>
+    <!-- WIDGET CODE END -->
+
+</body>
+</html>
